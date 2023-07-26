@@ -1,0 +1,22 @@
+树莓派安装流程
+ubuntu server 22.04 LTS版本
+
+设置网络
+cd /etc/netplan
+vim 50xxxxx.yml 仿写50...ymal文件
+sudo netplan generate
+sudo netplan try
+sudo netplan apply
+网络配置完成
+
+安装redis
+sudo apt install redis-server
+
+ubuntu22.04 默认安装python3.10
+
+redis 配置
+sudo chmod -R 777 /etc/redis
+vim /etc/redis/redis.conf
+注释掉 bind 127.0.0.1 ::1
+protected-mode yes 改为no
+daemonize yes 改为no
