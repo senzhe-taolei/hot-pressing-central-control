@@ -1,0 +1,2 @@
+RIGHT = "right"
+LEFT = "left"
