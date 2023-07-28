@@ -3,7 +3,7 @@ import snap7
 from utils import plc_utils, plc_read_universal, redis_utils, common
 from config.ip_list import ip_list
 from config.yeya_sites import yeya_sites
-from config import conf
+from config import conf, const
 
 
 class YeYaListen:
@@ -24,7 +24,8 @@ class YeYaListen:
                 update_time = int(time.time() * 1000)
                 data_dict["update_time"] = update_time
                 self.redis_local_db.redis_hmset(key, data_dict)
-                self.redis_server_db.redis_hmset(key, data_dict)
+                if conf.left_or_right == const.RIGHT:
+                    self.redis_server_db.redis_hmset(key, data_dict)
             except Exception as e:
                 print(e)
             finally:

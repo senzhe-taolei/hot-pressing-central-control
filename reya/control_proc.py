@@ -62,7 +62,7 @@ class ReYaControl:
         self.redis_local_db.redis_hmset(conf.redis_plan_local_info.format(plan_id), plan_info)
         # # 工位对应的plan和状态填写
 
-        return ''
+        return True
 
     # def app(self, recv_message):
     #     # 获取计划参数

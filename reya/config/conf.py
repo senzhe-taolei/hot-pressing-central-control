@@ -15,3 +15,5 @@ redis_chengliao_task_key = f"reya_task:{device_name}:chengliao:{left_or_right}"
 redis_station_working_info_key = "station_working_info"
 
 redis_plan_local_info = "redis_plan_local_info:{}"
+
+ip_listen_key = f"device:listen:{device_name}:ip:{left_or_right}"
