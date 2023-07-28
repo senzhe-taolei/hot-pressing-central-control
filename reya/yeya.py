@@ -16,6 +16,7 @@ class YeYa:
         pass
 
     def __del__(self):
+        self.plc.disconnect()
         self.plc.destroy()
 
     def yeya_start(self):
@@ -42,20 +43,3 @@ class YeYa:
 
         address3 = yeya_sites["油冷机停止"]["Address"]
         plc_write_utils.plc_write(self.plc, address3, str(1))
-
-    def yeya_loop_read_all_sites(self):
-        while True:
-            data = self.plc.read_area(snap7.client.Areas.DB, 13, 0, 374)
-            data_dict = plc_read_universal.split_address_values(yeya_sites, data)
-            key = conf.device_name + ":yeya"
-            update_time = int(time.time() * 1000)
-            data_dict["update_time"] = update_time
-            self.redis_local_db.redis_hmset(key, data_dict)
-            self.redis_server_db.redis_hmset(key, data_dict)
-
-
-
-# if __name__ == "__main__":
-#     yeya = YeYa()
-#     yeya.yeya_start()
-#     pass

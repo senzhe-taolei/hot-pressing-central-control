@@ -2,7 +2,7 @@ import redis
 
 
 class RedisUtils:
-    def __init__(self, ip, port=6379, db=1):
+    def __init__(self, ip, port=6379, db=0):
         pool = redis.ConnectionPool(host=ip, port=port, db=db, decode_responses=True)
         self.r = redis.StrictRedis(connection_pool=pool)  # 建立redis连接
 
@@ -76,8 +76,12 @@ class RedisUtils:
 
     # redis哈希中删除指定的key
     def redis_hdel(self, name: str, key: str):
-        return self.r.hdel(name, key)
+        return self.r.hdel(name, [key])
 
     # redis删除指定name
     def redis_del(self, name: str):
         return self.r.delete(name)
+
+    # redis
+    def redis_hgetall(self, name: str):
+        return self.r.hgetall(name)

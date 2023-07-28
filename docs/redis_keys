@@ -1,31 +1,38 @@
 压机：
-devicelisten:ZN-122/014:yaji:01
-devicelisten:ZN-122/014:yaji:02
-devicelisten:ZN-122/014:yaji:03
-devicelisten:ZN-122/014:yaji:04
-devicelisten:ZN-122/014:yaji:05
-devicelisten:ZN-122/014:yaji:06
-devicelisten:ZN-122/014:yaji:07
-devicelisten:ZN-122/014:yaji:08
+device_listen:ZN-122/014:yaji:01
+device_listen:ZN-122/014:yaji:02
+device_listen:ZN-122/014:yaji:03
+device_listen:ZN-122/014:yaji:04
+device_listen:ZN-122/014:yaji:05
+device_listen:ZN-122/014:yaji:06
+device_listen:ZN-122/014:yaji:07
+device_listen:ZN-122/014:yaji:08
 
 robot 
-devicelisten:ZN-122/014:robot:l
-devicelisten:ZN-122/014:robot:r
+device_listen:ZN-122/014:robot:l
+device_listen:ZN-122/014:robot:r
 
 液压：
-devicelisten:ZN-122/014:yeya
+device_listen:ZN-122/014:yeya
 
 称料：
-devicelisten:ZN-122/014:chengliao:main:l
-devicelisten:ZN-122/014:chengliao:main:l {
+device_listen:ZN-122/014:chengliao:main:l
+device_listen:ZN-122/014:chengliao:main:l {
     "上抹温度-实时"：33
     "上抹温度-设置"：33
 }
-devicelisten:ZN-122/014:chengliao:auxiliary:l
-devicelisten:ZN-122/014:chengliao:main:r
-devicelisten:ZN-122/014:chengliao:auxiliary:r
+device_listen:ZN-122/014:chengliao:auxiliary:l
+device_listen:ZN-122/014:chengliao:main:r
+device_listen:ZN-122/014:chengliao:auxiliary:r
 
 
 每个hash里都有一个update_time 记录更新时间，为毫秒时间戳
 
-devicelisten:
+redis任务队列:称料
+device_listen:ZN-122/014:chengliao:tasks
+
+
+工位对应plan和状态
+station_work_info:{
+    1 :{"plan_id":12345,}
+}

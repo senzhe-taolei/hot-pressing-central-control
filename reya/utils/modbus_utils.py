@@ -62,9 +62,9 @@ class ModbusTcpUtils:
         res = self.master.execute(1, cst.READ_HOLDING_REGISTERS, int(addr), num)
         return res[0]
 
-    def detect_wait_bool2(self, address, wait_status=True, out_time=None):
+    def detect_wait_bool(self, address, wait_status=True, out_time=None):
         start_time = time.time()
-        print('self.get_db_bool(address)', self.get_db_bool(address))
+        # print('self.get_db_bool(address)', self.get_db_bool(address))
         while self.get_db_bool(address) != wait_status:
             time.sleep(0.1)
             end_time = time.time()
@@ -74,7 +74,7 @@ class ModbusTcpUtils:
                     return False
         return True
 
-    async def detect_wait_bool(self, address, wait_status=True, out_time=None):
+    async def detect_wait_bool_async(self, address, wait_status=True, out_time=None):
         start_time = time.time()
         print('self.get_db_bool(address)', self.get_db_bool(address))
         while self.get_db_bool(address) != wait_status:

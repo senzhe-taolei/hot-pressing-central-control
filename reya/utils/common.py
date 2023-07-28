@@ -1,6 +1,7 @@
 import asyncio
 import time
-from bak.utils2 import plc_write_utils, plc_read_utils
+
+from utils import plc_write_utils, plc_read_utils
 
 
 # 协程run函数
@@ -44,5 +45,18 @@ async def plc_wait(plc, address, status, out_time=None):
             if span_time > out_time:
                 return False
     return True
+
+
+# 根据workstation参数获取 ZN-122/007#03 返回 3
+def get_sub_station_from_work_station(work_station):
+    return int(work_station.split("#")[1])
+
+
+def close_plc(plc):
+    try:
+        plc.disconnect()
+        plc.destroy()
+    except Exception as e:
+        print(e)
 
 

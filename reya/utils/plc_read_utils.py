@@ -161,3 +161,15 @@ def m_read_alone(plc, byte_index, bite_index):  # m byte_index.bite_index
     except Exception as e:
         print(f'data取值报错-->{e}')
         return ['connect_fail']
+
+def detect_plc_status(plc, address, wait_status, out_time=None):
+    start_time = time.time()
+    # print('self.get_db_bool(address)', self.get_db_bool(address))
+    while plc_read_alone(plc, address) != wait_status:
+        time.sleep(0.1)
+        end_time = time.time()
+        span_time = end_time - start_time
+        if out_time is not None:
+            if span_time > out_time:
+                return False
+    return True
