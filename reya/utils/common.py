@@ -25,10 +25,10 @@ async def plc_bool_write(plc, address, status, pulse=0):
     else:
         set = '0'
         reset = '1'
-    plc_write_utils.plc_write(plc, address, str(set))
+    plc_write_utils.plc_write_alone(plc, address, str(set))
     if pulse:
         await asyncio.sleep(pulse/1000)
-        plc_write_utils.plc_write(plc, address, str(reset))
+        plc_write_utils.plc_write_alone(plc, address, str(reset))
 
 
 # pulse 脉冲毫秒，自动复位

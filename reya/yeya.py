@@ -21,25 +21,25 @@ class YeYa:
 
     def yeya_start(self):
         address1 = yeya_sites["低压泵启动"]["Address"]
-        plc_write_utils.plc_write(self.plc, address1, str(1))
+        plc_write_utils.plc_write_alone(self.plc, address1, str(1))
 
         address2 = yeya_sites["高压泵启动"]["Address"]
-        plc_write_utils.plc_write(self.plc, address2, str(1))
+        plc_write_utils.plc_write_alone(self.plc, address2, str(1))
         time.sleep(2)
-        plc_write_utils.plc_write(self.plc, address1, str(0))
-        plc_write_utils.plc_write(self.plc, address2, str(0))
+        plc_write_utils.plc_write_alone(self.plc, address1, str(0))
+        plc_write_utils.plc_write_alone(self.plc, address2, str(0))
 
         address3 = yeya_sites["油冷机启动"]["Address"]
-        plc_write_utils.plc_write(self.plc, address3, str(1))
+        plc_write_utils.plc_write_alone(self.plc, address3, str(1))
 
     def yeya_stop(self):
         address1 = yeya_sites["低压泵停止"]["Address"]
-        plc_write_utils.plc_write(self.plc, address1, str(1))
+        plc_write_utils.plc_write_alone(self.plc, address1, str(1))
         address2 = yeya_sites["高压泵停止"]["Address"]
-        plc_write_utils.plc_write(self.plc, address2, str(1))
+        plc_write_utils.plc_write_alone(self.plc, address2, str(1))
         time.sleep(2)
-        plc_write_utils.plc_write(self.plc, address1, str(0))
-        plc_write_utils.plc_write(self.plc, address2, str(0))
+        plc_write_utils.plc_write_alone(self.plc, address1, str(0))
+        plc_write_utils.plc_write_alone(self.plc, address2, str(0))
 
         address3 = yeya_sites["油冷机停止"]["Address"]
-        plc_write_utils.plc_write(self.plc, address3, str(1))
+        plc_write_utils.plc_write_alone(self.plc, address3, str(1))
