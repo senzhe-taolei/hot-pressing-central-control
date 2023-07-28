@@ -73,9 +73,9 @@ class YaJi:
                 address = self.yaji_write_sites[name]["Address"]
                 data_type = self.yaji_write_sites[name]["DataType"]
                 if data_type.lower() == "real":
-                    result = plc_write_utils.plc_write(self.plc, address, str(params[key]), date_type='float')
+                    result = plc_write_utils.plc_write_alone(self.plc, address, str(params[key]), date_type='float')
                 else:
-                    result = plc_write_utils.plc_write(self.plc, address, str(params[key]))
+                    result = plc_write_utils.plc_write_alone(self.plc, address, str(params[key]))
 
     # 初始值设置，先清零
     def init(self):
@@ -84,17 +84,17 @@ class YaJi:
     # 加热启动
     def heat_start(self):
         address = self.yaji_write_sites["加热启动-设置"]["Address"]
-        result = plc_write_utils.plc_write(self.plc, address, str(1))
+        result = plc_write_utils.plc_write_alone(self.plc, address, str(1))
 
     # 加热停止
     def heat_stop(self):
         address = self.yaji_write_sites["加热停止-设置"]["Address"]
-        result = plc_write_utils.plc_write(self.plc, address, str(0))
+        result = plc_write_utils.plc_write_alone(self.plc, address, str(0))
 
     # 首检确认信号
     def first_check(self):
         address = self.yaji_write_sites["首检确认信号-设置"]["Address"]
-        result = plc_write_utils.plc_write(self.plc, address, str(0))
+        result = plc_write_utils.plc_write_alone(self.plc, address, str(0))
 
     # 检查温度等条件是否就绪，先校验温度
     def check_is_ok(self, station):

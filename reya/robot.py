@@ -36,7 +36,7 @@ class Robot:
 
     def set_write_param_status(self):
         addr1 = self.robot_sites["申请参数"]["Address"]
-        res2 = plc_write_utils.plc_write(self.plc, addr1, str(1))
+        res2 = plc_write_utils.plc_write_alone(self.plc, addr1, str(1))
 
     def get_write_param_status(self):
         addr1 = self.robot_sites["申请参数"]["Address"]
@@ -65,9 +65,9 @@ class Robot:
                 self.write_mujv_type(address, int(muju_type))
                 continue
             if data_type.lower() == "real":
-                result = plc_write_utils.plc_write(self.plc, address, str(params[name]), date_type='float')
+                result = plc_write_utils.plc_write_alone(self.plc, address, str(params[name]), date_type='float')
             else:
-                result = plc_write_utils.plc_write(self.plc, address, str(params[name]))
+                result = plc_write_utils.plc_write_alone(self.plc, address, str(params[name]))
             print(name + ":" + str(result))
             pass
 
@@ -84,7 +84,7 @@ class Robot:
         addr1 = self.robot_sites["模具类型"]["Address"]
         res1 = self.write_mujv_type(addr1, self.mvju_type)
         addr2 = self.robot_sites["工作位"]["Address"]
-        res2 = plc_write_utils.plc_write(self.plc, addr2, str(1))
+        res2 = plc_write_utils.plc_write_alone(self.plc, addr2, str(1))
         pass
 
     def robot_start_reset(self):
@@ -94,11 +94,11 @@ class Robot:
 
     def robot_action(self):
         address = self.robot_sites["启动"]["Address"]
-        plc_write_utils.plc_write(self.plc, address, str(1))
+        plc_write_utils.plc_write_alone(self.plc, address, str(1))
 
     def robot_reset(self):
         address = self.robot_sites["启动"]["Address"]
-        plc_write_utils.plc_write(self.plc, address, str(0))
+        plc_write_utils.plc_write_alone(self.plc, address, str(0))
 
     def read_mujv_type(self, address):
         db_num, byte_index = self.get_dbd_indexs(address)

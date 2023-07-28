@@ -30,7 +30,6 @@ def m_write(plc, byte_index, bite_index, value):
         bool_value = False
     try:
         # 先读取到原本的数据，然后改变需要改变的bit位数值，然后整体写入
-        # bool_data = bytearray(1)  # 声明数据写入的byte位数
         bool_data = plc.read_area(snap7.client.Areas.MK, 0, byte_index, 1)
         util.set_bool(bool_data, 0, bite_index, bool_value)  # bite_index——bool值写入的bite位置，其他类型没有此参数
         plc.write_area(snap7.client.Areas.MK, 0, byte_index, bool_data)  # 0————db区编号，其他区为0；byte_index————byte位置编号
@@ -127,237 +126,8 @@ def rfid_write(plc, db_index: int, byte_index: int, value: str):
         print(f'rfid,DB{db_index}.DBB{byte_index},write error:{str(e)}')
         return 'write_failed'
 
-    # ip: str, value_index: str, value: str
 
-
-def plc_write(plc, value_index: str, value: str, date_type='int'):
-    try:
-        if re.match(r'^(Q)([0-9]+)(\.)([0-7])$', value_index, re.I) \
-                and (value.lower() == 'true' or value == ''):
-            match_value_index = re.match(r'^(Q)([0-9]+)(\.)([0-7])$', value_index, re.I)
-            x = int(match_value_index.group(2))  # 获取q点byte位置编号
-            y = int(match_value_index.group(4))  # 获取q点bite位置编号
-            write_result = pa_write(plc, x, y, value)
-            return write_result
-
-        elif re.match(r'^(M)([0-9]+)(\.)([0-7])$', value_index, re.I) \
-                and (value.lower() == 'true' or value == '' or value == 'false'):
-            match_value_index = re.match(r'^(M)([0-9]+)(\.)([0-7])$', value_index, re.I)
-            x = int(match_value_index.group(2))  # 获取m点byte位置编号
-            y = int(match_value_index.group(4))  # 获取m点bite位置编号
-            write_result = m_write(plc, x, y, value)
-            return write_result
-
-        elif re.match(r'^(DB)([0-9]+)(\.)(DBX)([0-9]+)(\.)([0-7])$', value_index, re.I) \
-                and (value.lower() == 'true' or value == '' or value == 'false'):
-            match_value_index = re.match(r'^(DB)([0-9]+)(\.)(DBX)([0-9]+)(\.)([0-7])$', value_index, re.I)
-            x = int(match_value_index.group(2))  # 获取db点db区位置编号
-            y = int(match_value_index.group(5))  # 获取db点byte位置编号
-            z = int(match_value_index.group(7))  # 获取db点bite位置编号
-            write_result = dbx_write(plc, x, y, z, value)
-            return write_result
-
-        elif re.match(r'^(DB)([0-9]+)(\.)(DBW)([0-9]+)$', value_index, re.I) \
-                and re.match(r'^[0-9]+$', value):
-            match_value_index = re.match(r'^(DB)([0-9]+)(\.)(DBW)([0-9]+)$', value_index, re.I)
-            x = int(match_value_index.group(2))  # 获取db点db区位置编号
-            y = int(match_value_index.group(5))  # 获取db点byte位置编号
-            write_result = dbw_write(plc, x, y, value)
-            return write_result
-
-        elif re.match(r'^(DB)([0-9]+)(\.)(DBD)([0-9]+)$', value_index, re.I) \
-                and (date_type == 'float' or re.match(r'^[0-9]+(\.)[0-9]+$', value)):
-            match_value_index = re.match(r'^(DB)([0-9]+)(\.)(DBD)([0-9]+)$', value_index, re.I)
-            x = int(match_value_index.group(2))  # 获取db点db区位置编号
-            y = int(match_value_index.group(5))  # 获取db点byte位置编号
-            write_result = dbd_write_float(plc, x, y, value)
-            return write_result
-
-        elif re.match(r'^(DB)([0-9]+)(\.)(DBD)([0-9]+)$', value_index, re.I) \
-                and re.match(r'^[0-9]+$', value):
-            match_value_index = re.match(r'^(DB)([0-9]+)(\.)(DBD)([0-9]+)$', value_index, re.I)
-            x = int(match_value_index.group(2))  # 获取db点db区位置编号
-            y = int(match_value_index.group(5))  # 获取db点byte位置编号
-            write_result = dbd_write(plc, x, y, value)
-            return write_result
-
-        elif re.match(r'^(DB)([0-9]+)(\.)(DBB)([0-9]+)$', value_index, re.I) \
-                and re.match(r'^[0-9]+$', value):
-            match_value_index = re.match(r'^(DB)([0-9]+)(\.)(DBB)([0-9]+)$', value_index, re.I)
-            x = int(match_value_index.group(2))  # 获取db点db区位置编号
-            y = int(match_value_index.group(5))  # 获取db点byte位置编号
-            write_result = dbb_write(plc, x, y, value)
-            return write_result
-
-        elif re.match(r'^(DB)([0-9]+)(\.)(DBB)([0-9]+)$', value_index, re.I) \
-                and value[0] == 'E' and len(value) == 16:
-            match_value_index = re.match(r'^(DB)([0-9]+)(\.)(DBB)([0-9]+)$', value_index, re.I)
-            x = int(match_value_index.group(2))  # 获取db点db区位置编号
-            y = int(match_value_index.group(5))  # 获取db点byte位置编号
-            write_result = rfid_write(plc, x, y, value)
-            return write_result
-
-        else:
-            return f'-->{value_index}写入{value}调用失败！'
-    except Exception as e:
-        print(f'连接失败，尝试重连！error:{str(e)}')
-
-
-def plc_write_batch(ip: str, write_args_list: list, db, log_name='plc_write_batch'):
-    plc = snap7.client.Client()
-    try:
-        plc.connect(ip, 0, 1)
-        log = f"plc:{ip},建立连接成功成功"
-        print(log)
-        for i in write_args_list:
-            # i={'value_index':点位，'value':写入值}
-            value_index = i['value_index']
-            value = i['value']
-
-            if re.match(r'^(DB)([0-9]+)(\.)(DBX)([0-9]+)(\.)([0-7])$', value_index, re.I) \
-                    and (value.lower() == 'true' or value.lower() == 'false'):
-                match_value_index = re.match(r'^(DB)([0-9]+)(\.)(DBX)([0-9]+)(\.)([0-7])$', value_index, re.I)
-                x = int(match_value_index.group(2))  # 获取db点db区位置编号
-                y = int(match_value_index.group(5))  # 获取db点byte位置编号
-                z = int(match_value_index.group(7))  # 获取db点bite位置编号
-                while True:
-                    read_value = str(dbx_read_alone(plc, x, y, z))
-                    # 如果读取失败
-                    if read_value == 'read_failed':
-                        log = f"DB{x}.DBX{y}.{z}写入{value}读取校验时报错"
-                        print(log)
-                        return 'batch_write_failed'
-                    # 如果读取值等于写入值
-                    elif read_value == value:
-                        break
-                    # 开始写入
-                    else:
-                        write_result = dbx_write(plc, x, y, z, value)
-                        if write_result == 'write_failed':
-                            log = f"DB{x}.DBX{y}.{z}写入{value}写入时时报错"
-                            print(log)
-                            return 'batch_write_failed'
-                        else:
-                            continue
-
-            elif re.match(r'^(DB)([0-9]+)(\.)(DBB)([0-9]+)$', value_index, re.I) \
-                    and re.match(r'^[0-9]+$', value):
-                match_value_index = re.match(r'^(DB)([0-9]+)(\.)(DBB)([0-9]+)$', value_index, re.I)
-                x = int(match_value_index.group(2))  # 获取db点db区位置编号
-                y = int(match_value_index.group(5))  # 获取db点byte位置编号
-                while True:
-                    read_value = str(dbb_read_alone(plc, x, y))
-                    # 如果读取失败
-                    if read_value == 'read_failed':
-                        log = f"DB{x}.DBB{y}写入{value}读取校验时报错"
-                        print(log)
-                        return 'batch_write_failed'
-                    # 如果读取值等于写入值
-                    elif read_value == value:
-                        break
-                    # 开始写入
-                    else:
-                        write_result = dbb_write(plc, x, y, value)
-                        if write_result == 'write_failed':
-                            log = f"DB{x}.DBB{y}写入{value}写入时时报错"
-                            print(log)
-                            return 'batch_write_failed'
-                        else:
-                            continue
-
-            elif re.match(r'^(DB)([0-9]+)(\.)(DBW)([0-9]+)$', value_index, re.I) \
-                    and re.match(r'^[0-9]+$', value):
-                match_value_index = re.match(r'^(DB)([0-9]+)(\.)(DBW)([0-9]+)$', value_index, re.I)
-                x = int(match_value_index.group(2))  # 获取db点db区位置编号
-                y = int(match_value_index.group(5))  # 获取db点byte位置编号
-                while True:
-                    read_value = str(dbw_read_alone(plc, x, y))
-                    # 如果读取失败
-                    if read_value == 'read_failed':
-                        log = f"DB{x}.DBW{y}写入{value}读取校验时报错"
-                        print(log)
-                        return 'batch_write_failed'
-                    # 如果读取值等于写入值
-                    elif read_value == value:
-                        break
-                    # 开始写入
-                    else:
-                        write_result = dbw_write(plc, x, y, value)
-                        if write_result == 'write_failed':
-                            log = f"DB{x}.DBW{y}写入{value}写入时报错"
-                            print(log)
-                            return 'batch_write_failed'
-                        else:
-                            continue
-
-            elif re.match(r'^(DB)([0-9]+)(\.)(DBD)([0-9]+)$', value_index, re.I) \
-                    and re.match(r'^[0-9]+$', value):
-                match_value_index = re.match(r'^(DB)([0-9]+)(\.)(DBD)([0-9]+)$', value_index, re.I)
-                x = int(match_value_index.group(2))  # 获取db点db区位置编号
-                y = int(match_value_index.group(5))  # 获取db点byte位置编号
-                while True:
-                    read_value = str(dbd_read_alone(plc, x, y))
-                    # 如果读取失败
-                    if read_value == 'read_failed':
-                        log = f"DB{x}.DBD{y}写入{value}读取校验时报错"
-                        print(log)
-                        return 'batch_write_failed'
-                    # 如果读取值等于写入值
-                    elif read_value == value:
-                        break
-                    # 开始写入
-                    else:
-                        write_result = dbd_write(plc, x, y, value)
-                        if write_result == 'write_failed':
-                            log = f"DB{x}.DBD{y}写入{value}写入时时报错"
-                            print(log)
-                            return 'batch_write_failed'
-                        else:
-                            continue
-
-            elif re.match(r'^(DB)([0-9]+)(\.)(DBB)([0-9]+)$', value_index, re.I) \
-                    and value[0] == 'E' and len(value) == 16:
-                match_value_index = re.match(r'^(DB)([0-9]+)(\.)(DBB)([0-9]+)$', value_index, re.I)
-                x = int(match_value_index.group(2))  # 获取db点db区位置编号
-                y = int(match_value_index.group(5))  # 获取db点byte位置编号
-                while True:
-                    read_value = str(rfid_read_alone(plc, x, y))
-                    # 如果读取失败
-                    if read_value == 'read_failed':
-                        log = f"rfid, DB{x}.DBB{y}写入{value}读取校验时报错"
-                        print(log)
-                        return 'batch_write_failed'
-                    # 如果读取值等于写入值
-                    elif read_value == value:
-                        break
-                    # 开始写入
-                    else:
-                        write_result = rfid_write(plc, x, y, value)
-                        if write_result == 'write_failed':
-                            log = f"rfid, DB{x}.DBB{y}写入{value}写入时时报错"
-                            print(log)
-                            return 'batch_write_failed'
-                        else:
-                            continue
-
-            else:
-                log = f"{ip}---{value_index}写入{value}匹配写入方法失败！"
-                print(log)
-
-        plc.disconnect()
-        plc.destroy()
-        log = f"批量写入{write_args_list},写入完成！"
-        print(log)
-        return 'batch_write_success'
-    except Exception as e:
-        plc.disconnect()
-        plc.destroy()
-        log = f"plc:{ip},建立连接失败---{str(e)}"
-        db.write_log_no_task_number(log_name, log)
-        return 'batch_write_failed'
-
-
-def on_link_write_batch(plc, db, write_args_list: list, log_name: str):
+def plc_write_batch(plc, db, write_args_list: list, log_name: str):
     for i in write_args_list:
         # i={'value_index':点位，'value':写入值}
         value_index = i['value_index']
@@ -448,88 +218,211 @@ def on_link_write_batch(plc, db, write_args_list: list, log_name: str):
     return 'batch_write_success'
 
 
-def on_link_write_alone(plc, db, value_index: str, value: str, log_name: str):
-    if re.match(r'^(DB)([0-9]+)(\.)(DBW)([0-9]+)$', value_index, re.I) \
-            and re.match(r'^[0-9]+$', value):
-        match_value_index = re.match(r'^(DB)([0-9]+)(\.)(DBW)([0-9]+)$', value_index, re.I)
-        x = int(match_value_index.group(2))  # 获取db点db区位置编号
-        y = int(match_value_index.group(5))  # 获取db点byte位置编号
-        while True:
-            read_value = str(dbw_read_alone(plc, x, y))
-            # 如果读取失败
-            if read_value == 'read_failed':
-                log = f'DB{x}.DBW{y}写入{value}读取校验时报错'
-                db.write_log_no_task_number(log_name, log)
-                return 'write_failed'
-            # 如果读取值等于写入值
-            elif read_value == value:
-                break
-            # 开始写入
-            else:
-                write_result = dbw_write(plc, x, y, value)
-                if write_result == 'write_failed':
-                    log = f'DB{x}.DBW{y}写入{value}写入时报错'
-                    db.write_log_no_task_number(log_name, log)
+def plc_write_alone(plc, value_index: str, value: str, date_type='int'):
+    try:
+        # 如果是Q点
+        if re.match(r'^(Q)([0-9]+)(\.)([0-7])$', value_index, re.I) \
+                and (value.lower() == 'true' or value == ''):
+            match_value_index = re.match(r'^(Q)([0-9]+)(\.)([0-7])$', value_index, re.I)
+            x = int(match_value_index.group(2))  # 获取q点byte位置编号
+            y = int(match_value_index.group(4))  # 获取q点bite位置编号
+            while True:
+                read_value = str(pa_read_alone(plc, x, y))
+                # 如果读取失败
+                if read_value == 'read_failed':
                     return 'write_failed'
+                # 如果读取值等于写入值
+                elif read_value == value:
+                    return 'write_success'
+                # 开始写入
                 else:
-                    continue
-
-    elif re.match(r'^(DB)([0-9]+)(\.)(DBD)([0-9]+)$', value_index, re.I) \
-            and re.match(r'^[0-9]+$', value):
-        match_value_index = re.match(r'^(DB)([0-9]+)(\.)(DBD)([0-9]+)$', value_index, re.I)
-        x = int(match_value_index.group(2))  # 获取db点db区位置编号
-        y = int(match_value_index.group(5))  # 获取db点byte位置编号
-        while True:
-            read_value = str(dbd_read_alone(plc, x, y))
-            # 如果读取失败
-            if read_value == 'read_failed':
-                log = f'DB{x}.DBD{y}写入{value}读取校验时报错'
-                db.write_log_no_task_number(log_name, log)
-                return 'write_failed'
-            # 如果读取值等于写入值
-            elif read_value == value:
-                break
-            # 开始写入
-            else:
-                write_result = dbd_write(plc, x, y, value)
-                if write_result == 'write_failed':
-                    log = f'DB{x}.DBD{y}写入{value}写入时时报错'
-                    db.write_log_no_task_number(log_name, log)
+                    write_result = pa_write(plc, x, y, value)
+                    if write_result == 'write_failed':
+                        return 'write_failed'
+                    else:
+                        continue
+        # 如果是M点
+        elif re.match(r'^(M)([0-9]+)(\.)([0-7])$', value_index, re.I) \
+                and (value.lower() == 'true' or value == '' or value == 'false'):
+            match_value_index = re.match(r'^(M)([0-9]+)(\.)([0-7])$', value_index, re.I)
+            x = int(match_value_index.group(2))  # 获取m点byte位置编号
+            y = int(match_value_index.group(4))  # 获取m点bite位置编号
+            while True:
+                read_value = str(mk_read_alone(plc, x, y))
+                # 如果读取失败
+                if read_value == 'read_failed':
                     return 'write_failed'
+                # 如果读取值等于写入值
+                elif read_value == value:
+                    return 'write_success'
+                # 开始写入
                 else:
-                    continue
-
-    elif re.match(r'^(DB)([0-9]+)(\.)(DBX)([0-9]+)(\.)([0-7])$', value_index, re.I) \
-            and (value.lower() == 'true' or value.lower() == 'false'):
-        match_value_index = re.match(r'^(DB)([0-9]+)(\.)(DBX)([0-9]+)(\.)([0-7])$', value_index, re.I)
-        x = int(match_value_index.group(2))  # 获取db点db区位置编号
-        y = int(match_value_index.group(5))  # 获取db点byte位置编号
-        z = int(match_value_index.group(7))  # 获取db点bite位置编号
-        while True:
-            read_value = str(dbx_read_alone(plc, x, y, z))
-            # 如果读取失败
-            if read_value == 'read_failed':
-                log = f'DB{x}.DBX{y}.{z}写入{value}读取校验时报错'
-                db.write_log_no_task_number(log_name, log)
-                return 'write_failed'
-            # 如果读取值等于写入值
-            elif read_value == value:
-                break
-            # 开始写入
-            else:
-                write_result = dbx_write(plc, x, y, z, value)
-                if write_result == 'write_failed':
-                    log = f'DB{x}.DBX{y}.{z}写入{value}写入时时报错'
-                    db.write_log_no_task_number(log_name, log)
+                    write_result = m_write(plc, x, y, value)
+                    if write_result == 'write_failed':
+                        return 'write_failed'
+                    else:
+                        continue
+        # 如果是DBX点
+        elif re.match(r'^(DB)([0-9]+)(\.)(DBX)([0-9]+)(\.)([0-7])$', value_index, re.I) \
+                and (value.lower() == 'true' or value.lower() == 'false'):
+            match_value_index = re.match(r'^(DB)([0-9]+)(\.)(DBX)([0-9]+)(\.)([0-7])$', value_index, re.I)
+            x = int(match_value_index.group(2))  # 获取db点db区位置编号
+            y = int(match_value_index.group(5))  # 获取db点byte位置编号
+            z = int(match_value_index.group(7))  # 获取db点bite位置编号
+            while True:
+                read_value = str(dbx_read_alone(plc, x, y, z))
+                # 如果读取失败
+                if read_value == 'read_failed':
                     return 'write_failed'
+                # 如果读取值等于写入值
+                elif read_value == value:
+                    return 'write_success'
+                # 开始写入
                 else:
-                    continue
+                    write_result = dbx_write(plc, x, y, z, value)
+                    if write_result == 'write_failed':
+                        return 'write_failed'
+                    else:
+                        continue
+        # 如果是DBB点
+        elif re.match(r'^(DB)([0-9]+)(\.)(DBB)([0-9]+)$', value_index, re.I) \
+                and re.match(r'^[0-9]+$', value):
+            match_value_index = re.match(r'^(DB)([0-9]+)(\.)(DBB)([0-9]+)$', value_index, re.I)
+            x = int(match_value_index.group(2))  # 获取db点db区位置编号
+            y = int(match_value_index.group(5))  # 获取db点byte位置编号
+            while True:
+                read_value = str(dbb_read_alone(plc, x, y))
+                # 如果读取失败
+                if read_value == 'read_failed':
+                    return 'write_failed'
+                # 如果读取值等于写入值
+                elif read_value == value:
+                    return 'write_success'
+                # 开始写入
+                else:
+                    write_result = dbb_write(plc, x, y, value)
+                    if write_result == 'write_failed':
+                        return 'write_failed'
+                    else:
+                        continue
+        # 如果是DBW点
+        elif re.match(r'^(DB)([0-9]+)(\.)(DBW)([0-9]+)$', value_index, re.I) \
+                and re.match(r'^[0-9]+$', value):
+            match_value_index = re.match(r'^(DB)([0-9]+)(\.)(DBW)([0-9]+)$', value_index, re.I)
+            x = int(match_value_index.group(2))  # 获取db点db区位置编号
+            y = int(match_value_index.group(5))  # 获取db点byte位置编号
+            while True:
+                read_value = str(dbw_read_alone(plc, x, y))
+                # 如果读取失败
+                if read_value == 'read_failed':
+                    return 'write_failed'
+                # 如果读取值等于写入值
+                elif read_value == value:
+                    return 'write_success'
+                # 开始写入
+                else:
+                    write_result = dbw_write(plc, x, y, value)
+                    if write_result == 'write_failed':
+                        return 'write_failed'
+                    else:
+                        continue
+        # 如果是DBD浮点数点
+        elif re.match(r'^(DB)([0-9]+)(\.)(DBD)([0-9]+)$', value_index, re.I) \
+                and (date_type == 'float' or re.match(r'^[0-9]+(\.)[0-9]+$', value)):
+            match_value_index = re.match(r'^(DB)([0-9]+)(\.)(DBD)([0-9]+)$', value_index, re.I)
+            x = int(match_value_index.group(2))  # 获取db点db区位置编号
+            y = int(match_value_index.group(5))  # 获取db点byte位置编号
+            while True:
+                read_value = str(dbdf_read_alone(plc, x, y))
+                # 如果读取失败
+                if read_value == 'read_failed':
+                    return 'write_failed'
+                # 如果读取值等于写入值
+                elif read_value in value:
+                    return 'write_success'
+                # 开始写入
+                else:
+                    write_result = dbd_write_float(plc, x, y, value)
+                    if write_result == 'write_failed':
+                        return 'write_failed'
+                    else:
+                        continue
+        # 如果是DBD整形
+        elif re.match(r'^(DB)([0-9]+)(\.)(DBD)([0-9]+)$', value_index, re.I) \
+                and re.match(r'^[0-9]+$', value):
+            match_value_index = re.match(r'^(DB)([0-9]+)(\.)(DBD)([0-9]+)$', value_index, re.I)
+            x = int(match_value_index.group(2))  # 获取db点db区位置编号
+            y = int(match_value_index.group(5))  # 获取db点byte位置编号
+            while True:
+                read_value = str(dbd_read_alone(plc, x, y))
+                # 如果读取失败
+                if read_value == 'read_failed':
+                    return 'write_failed'
+                # 如果读取值等于写入值
+                elif read_value == value:
+                    return 'write_success'
+                # 开始写入
+                else:
+                    write_result = dbd_write(plc, x, y, value)
+                    if write_result == 'write_failed':
+                        return 'write_failed'
+                    else:
+                        continue
+        # 如果是RFID
+        elif re.match(r'^(DB)([0-9]+)(\.)(DBB)([0-9]+)$', value_index, re.I) \
+                and value[0] == 'E' and len(value) == 16:
+            match_value_index = re.match(r'^(DB)([0-9]+)(\.)(DBB)([0-9]+)$', value_index, re.I)
+            x = int(match_value_index.group(2))  # 获取db点db区位置编号
+            y = int(match_value_index.group(5))  # 获取db点byte位置编号
+            while True:
+                read_value = str(rfid_read_alone(plc, x, y))
+                # 如果读取失败
+                if read_value == 'read_failed':
+                    return 'write_failed'
+                # 如果读取值等于写入值
+                elif read_value == value:
+                    return 'write_success'
+                # 开始写入
+                else:
+                    write_result = rfid_write(plc, x, y, value)
+                    if write_result == 'write_failed':
+                        return 'write_failed'
+                    else:
+                        continue
+        else:
+            return f'{value_index}写入{value}匹配写入方法失败！'
+    except Exception as e:
+        return  f'{value_index}写入{value}匹配写入报错：{str(e)}'
 
-    else:
-        log = f'{value_index}写入{value}匹配写入方法失败！'
-        db.write_log_no_task_number(log_name, log)
 
-    return 'write_success'
+# Q点的单点位读取，返回value值
+def pa_read_alone(plc, byte_index, bite_index):
+    # 参数说明：snap7.client.Areas.DB————DB-DB区；PE，I区；PA，Q区
+    # 参数说明：db_num————DB区的编号，I区和Q区写0
+    # 参数说明：0————起始byte地址，注意不是bite地址
+    # 参数说明：length————读取byte的长度
+    try:
+        data = plc.read_area(snap7.client.Areas.PA, 0, byte_index, 1)
+        pa_value = str(util.get_bool(data, 0, bite_index)).lower()
+        return pa_value
+    except Exception as e:
+        print(f'error:{str(e)}')
+        return 'read_failed'
+
+
+# M点的单点位读取，返回value值
+def mk_read_alone(plc, byte_index, bite_index):
+    # 参数说明：snap7.client.Areas.DB————DB-DB区；PE，I区；PA，Q区
+    # 参数说明：db_num————DB区的编号，I区和Q区写0
+    # 参数说明：0————起始byte地址，注意不是bite地址
+    # 参数说明：length————读取byte的长度
+    try:
+        data = plc.read_area(snap7.client.Areas.MK, 0, byte_index, 1)
+        mk_value = str(util.get_bool(data, 0, bite_index)).lower()
+        return mk_value
+    except Exception as e:
+        print(f'error:{str(e)}')
+        return 'read_failed'
 
 
 # dbx的单点位读取，返回value值
@@ -567,6 +460,17 @@ def dbw_read_alone(plc, db_num: int, byte_index: int):
         return value
     except Exception as e:
         print(f'DB{db_num}.DBW{byte_index},read error:{str(e)}')
+        return 'read_failed'
+
+
+# dbd的浮点数单点位读取，返回value列表
+def dbdf_read_alone(plc, db_num: int, byte_index: int):
+    try:
+        data = plc.read_area(snap7.client.Areas.DB, db_num, byte_index, 4)
+        value = util.get_real(data, 0)
+        return value
+    except Exception as e:
+        print(f'error:{str(e)}')
         return 'read_failed'
 
 
