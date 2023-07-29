@@ -1,7 +1,7 @@
 import asyncio
 import time
 
-from utils import plc_write_utils, plc_read_utils
+import plc_write_utils, plc_read_utils
 
 
 # 协程run函数

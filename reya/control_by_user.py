@@ -3,14 +3,31 @@ from config.robot_sites import robot_left_sites as robot_left_sites, robot_right
 from utils.plc_utils import get_plc_connection
 from utils.plc_write_utils import plc_write_alone
 from config.yeya_sites import yeya_sites as yeya_site
-from config.yaji_sites import yaji_1_sites_write as yaji_1_sites, yaji_2_sites_write as yaji_2_sites, yaji_3_sites_write as yaji_3_sites, yaji_4_sites_write as yaji_4_sites
+from config.yaji_sites import yaji_1_sites_write as yaji_1_sites, yaji_2_sites_write as yaji_2_sites, \
+    yaji_3_sites_write as yaji_3_sites, yaji_4_sites_write as yaji_4_sites
+from config.chengliao_sites import chengliao_write_sites as chengliao_sites
+
 
 # 设备手动单点控制指令或者参数下发
 def device_user_control(device_name: str, control_name: str, control_value: str):
-    if device_name.startswith("zhulioa") or device_name.startswith("fuliao"):   # modbus通讯
-        pass
+    if device_name.startswith("zhuliao") or device_name.startswith("fuliao"):  # modbus通讯
+        if device_name.startswith("zhuliao"):
+            if device_name.endswith("l"):  # 参数示例：zhuliao_l zhulioa_r
+                ip = ip_list.get("称料主左")
+            elif device_name.endswith("r"):
+                ip = ip_list.get("称料主右")
+            else:
+                return {"code": 500, "msg": f"参数device_name：{device_name}不合法！"}
+        else:
+            if device_name.endswith("l"):  # 参数示例：zhuliao_l zhulioa_r
+                ip = ip_list.get("称料辅左")
+            elif device_name.endswith("r"):
+                ip = ip_list.get("称料辅右")
+            else:
+                return {"code": 500, "msg": f"参数device_name：{device_name}不合法！"}
+        modbus_address = chengliao_sites.get(control_name).get("Address")
     else:  # snap7通讯
-        if device_name.startswith("robot"):
+        if device_name.startswith("robot"):  # 参数示例：robot_l robot_r
             ip = ip_list.get("机械手")
             if device_name.endswith("l"):
                 plc_address = robot_left_sites.get(control_name).get("Address")
@@ -21,20 +38,13 @@ def device_user_control(device_name: str, control_name: str, control_value: str)
         elif device_name.startswith("yeya"):
             ip = ip_list.get("液压站")
             plc_address = yeya_site.get(control_name).get("Address")
-        elif device_name.startswith("yaji_l"):
-            ip = ip_list.get("压机左")
-            if device_name.endswith("1"):
-                plc_address = yaji_1_sites.get(control_name).get("Address")
-            elif device_name.endswith("2"):
-                plc_address = yaji_2_sites.get(control_name).get("Address")
-            elif device_name.endswith("3"):
-                plc_address = yaji_3_sites.get(control_name).get("Address")
-            elif device_name.endswith("4"):
-                plc_address = yaji_4_sites.get(control_name).get("Address")
+        elif device_name.startswith("yaji"):  # 参数示例：yaji_l_1 yaji_r_1
+            if device_name.startswith("yaji_l"):
+                ip = ip_list.get("压机左")
+            elif device_name.startswith("yaji_r"):
+                ip = ip_list.get("压机右")
             else:
                 return {"code": 500, "msg": f"参数device_name：{device_name}不合法！"}
-        elif device_name.startswith("yaji_r"):
-            ip = ip_list.get("压机右")
             if device_name.endswith("1"):
                 plc_address = yaji_1_sites.get(control_name).get("Address")
             elif device_name.endswith("2"):
