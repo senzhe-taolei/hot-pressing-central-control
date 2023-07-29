@@ -11,14 +11,13 @@ from utils import redis_utils
 from utils.logger import MyLogging
 from config import conf
 
-
 logger = MyLogging("controlLog", file="../logs/control.log")
 
 
 class ReYaControl:
 
     # "Workstation":"ZN-122/001#03"
-    def __init__(self,):
+    def __init__(self, ):
         self.redis_local_db = redis_utils.RedisUtils(conf.redis_local_host, conf.redis_local_port)
         self.redis_server_db = redis_utils.RedisUtils(conf.redis_server_host, conf.redis_server_port)
 
@@ -137,13 +136,15 @@ class ReYaControl:
                 self.chengliao_status = 2
                 print('33333')
                 # await self.robot_process()
+
     # async
     def robot_process(self, left_or_right, hole_num, sub_station):
         print("robot_process")
         self.robot = Robot(left_or_right, hole_num, sub_station)
         # 监听
         while self.finish_num < self.plan_num:
-            print("robot_process", self.finish_num, self.plan_num, self.chengliao_status, self.robot.get_write_param_status())
+            print("robot_process", self.finish_num, self.plan_num, self.chengliao_status,
+                  self.robot.get_write_param_status())
             if self.chengliao_status == 2 and self.robot.get_write_param_status() in [1, '1', True, 'true']:
                 # 机械臂接料
                 print('iiiii')
@@ -154,8 +155,6 @@ class ReYaControl:
             time.sleep(1)
 
         pass
-
-
 
 if __name__ == "__main__":
     # "Hole_Times": 2, "Num": 4,

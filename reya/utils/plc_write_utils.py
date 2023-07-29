@@ -83,6 +83,7 @@ def dbd_write(plc, db_index: int, byte_index: int, value: str):
         print(f'error:{str(e)}')
         return 'write_failed'
 
+
 # DBD写入 float
 def dbd_write_float(plc, db_index: int, byte_index: int, value: str):
     try:
@@ -94,6 +95,7 @@ def dbd_write_float(plc, db_index: int, byte_index: int, value: str):
     except Exception as e:
         print(f'error:{str(e)}')
         return 'write_failed'
+
 
 # DBB写入
 def dbb_write(plc, db_index: int, byte_index: int, value: str):
@@ -392,7 +394,7 @@ def plc_write_alone(plc, value_index: str, value: str, date_type='int'):
         else:
             return f'{value_index}写入{value}匹配写入方法失败！'
     except Exception as e:
-        return  f'{value_index}写入{value}匹配写入报错：{str(e)}'
+        return f'{value_index}写入{value}匹配写入报错：{str(e)}'
 
 
 # Q点的单点位读取，返回value值
@@ -499,5 +501,3 @@ def rfid_read_alone(plc, db_num: int, byte_index: int):
     except Exception as e:
         print(f'rfid,DB{db_num}.DBB{byte_index},read error:{str(e)}')
         return 'read_failed'
-
-
