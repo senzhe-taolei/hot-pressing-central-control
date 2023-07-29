@@ -11,13 +11,15 @@ app = FastAPI()
 
 # 新的热压计划
 @app.post("/reya/newTaskPlan", status_code=status.HTTP_200_OK)
-async def new_task(data: dict, background_tasks: BackgroundTasks):
+def new_task(data: dict):
     try:
         request_log = json.dumps(data)
         logger.info(request_log)
         plan_id = data.get("production_plan")
-        background_tasks.add_task(ReYaControl().plan, plan_id)
-        return {"message": "Notification sent in the background"}
+        res = ReYaControl().plan(plan_id)
+        if res:
+            return {"status": 200, "message": ""}
+        return {"status": 400, "message": "something error"}
     except Exception as e:
         logger.error(f"srm_task_clear:{data}, error:{str(e)}")
         return {"code": 500, "msg": f"接口异常{str(e)}"}
